@@ -206,26 +206,46 @@
     <script>
         const socket = io();
 
-        const cameraFeed = document.getElementById("camera-feed");
-        const statusText = document.getElementById("status");
-        const earText = document.getElementById("ear");
-        const marText = document.getElementById("mar");
-        const headText = document.getElementById("head");
+        const cameraFeed = document.getElementById("video-stream");
+        const statusText = document.getElementById("overall-status");
+        const earText = document.getElementById("ear-val");
+        const marText = document.getElementById("mar-val");
+        const headText = document.getElementById("head-val");
+
+        const connDot = document.getElementById("conn-dot");
+        const connText = document.getElementById("conn-text");
 
         socket.on('connect', () => {
             console.log("Connected to server");
+
+            connDot.classList.add("connected");
+            connText.innerText = "Connected to Server";
+        });
+
+        socket.on('disconnect', () => {
+            console.log("Disconnected");
+
+            connDot.classList.remove("connected");
+            connText.innerText = "Disconnected from Server";
         });
 
         socket.on('update_dashboard', (data) => {
 
-            // UPDATE VIDEO FRAME REALTIME
-            cameraFeed.src = "data:image/jpeg;base64," + data.image + "?t=" + new Date().getTime();
+            // VIDEO REALTIME
+            if (data.image) {
+                cameraFeed.src =
+                    "data:image/jpeg;base64," +
+                    data.image +
+                    "?t=" + new Date().getTime();
+            }
 
-            // UPDATE DATA
-            statusText.innerText = data.status;
-            earText.innerText = Number(data.ear).toFixed(2);
-            marText.innerText = Number(data.mar).toFixed(2);
-            headText.innerText = Number(data.head).toFixed(1);
+            // UPDATE STATUS
+            statusText.innerText = data.status || "AMAN";
+
+            // UPDATE SENSOR
+            earText.innerText = Number(data.ear || 0).toFixed(2);
+            marText.innerText = Number(data.mar || 0).toFixed(2);
+            headText.innerText = Number(data.head || 0).toFixed(1);
 
         });
     </script>
