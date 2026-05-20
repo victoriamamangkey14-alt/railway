@@ -13,7 +13,7 @@ app = Flask(__name__)
 socketio = SocketIO(
     app,
     cors_allowed_origins="*",
-    async_mode='gevent'
+    async_mode='threading'
 )
 
 # ===============================
@@ -110,7 +110,7 @@ def handle_video_frame(data):
         # ===============================
         # KIRIM KE DASHBOARD
         # ===============================
-        emit('update_dashboard', {
+        socketio.emit('update_dashboard', {
             'image': data.get('image'),
             'ear': ear,
             'mar': mar,
